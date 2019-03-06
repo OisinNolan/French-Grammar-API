@@ -1,10 +1,12 @@
 import urllib.request
 import re
+from bs4 import BeautifulSoup
 
 print("Enter a French word:")
-searchWord = input().lower();
+searchWord = input().lower()
+searchWordForURL = searchWord.replace(" ", "%20")
 
-url = 'http://www.wordreference.com/fren/' + searchWord
+url = 'http://www.wordreference.com/fren/' + searchWordForURL
 
 req = urllib.request.Request(
     url, 
@@ -15,21 +17,42 @@ req = urllib.request.Request(
 )
 
 byteData = urllib.request.urlopen(req)
-stringData = byteData.read().decode('utf-8')
+stringData = byteData.read().decode('utf8')
 
-regex = searchWord + ".*?(masculin|féminin)"
+soup = BeautifulSoup(stringData, features="lxml")
+data = []
+noEntryFound = soup.find('p', attrs={'id':'noEntryFound'})
 
-wordsInHtml = re.findall(regex, stringData)
+if not noEntryFound:
+    table = soup.find('table', attrs={'class':'WRD'})
 
-if len(wordsInHtml) > 0:
-    wordGenderCode = re.findall("(masculin|féminin)", wordsInHtml[0])[0]
+    rows = table.find_all('tr')
+    for row in rows:
+        cols = row.find_all('td')
+        cols = [ele.text.strip() for ele in cols]
+        data.append([ele for ele in cols if ele])
 
-    wordGender = ""
-    if wordGenderCode == "masculin":
-        wordGender = "masculine"
-    elif wordGenderCode == "féminin":
-        wordGender = "feminine"
-    print(searchWord + " is " + wordGender)
+    searchWordText = ""
+    wordDict = {}
+
+    wordMatch = False
+
+    for list in data:
+        for text in list:
+            if text[:len(searchWord)] == searchWord and not wordMatch:
+                wordDict[searchWord] = text.split()[1][:-3]
+                wordMatch = True
+                // only match word if it actually is a nom!
+
+    genderCodes = {
+        'nm' : 'masculine',
+        'nf' : 'feminine',
+        'nmpl' : 'masculine plural',
+        'nfpl' : 'feminine plural',
+    }
+
+    output = searchWord + " is " + genderCodes[wordDict[searchWord]]
+    print(output)
 
 else:
     print("Sorry, word not found!")
