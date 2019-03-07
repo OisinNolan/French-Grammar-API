@@ -55,6 +55,7 @@ def getWordData(word):
             'viverbe' : 'intransitive verb',
             'interjinterjection' : 'interjection',
             'pron' : 'pronoun',
+            'article' : 'article',
         }
 
         for list in data:
@@ -73,13 +74,87 @@ def getWordData(word):
 
 # API functions
 
-def getGender(word):
+def getAllGenders(word):
+    word = word.lower()
     wordDict = getWordData(word)
-    genderCodes = ['masculine noun', 'feminine noun', 'masculine plural noun', 'feminine plural noun', 'masculine/feminine noun']
-    wordGenders = []
+    if wordDict is None:
+        return None
+    else:
+        genderCodes = ['masculine noun', 'feminine noun', 'masculine plural noun', 'feminine plural noun', 'masculine/feminine noun']
+        wordGenders = []
 
-    for code in wordDict[word]:
-        if code in genderCodes:
-            wordGenders.append(code)
+        for code in wordDict[word]:
+            if code in genderCodes:
+                wordGenders.append(code)
 
-    return wordGenders
+        if len(wordGenders) > 0:
+            return wordGenders
+        else:
+            return None
+
+def getGender(word):
+    word = word.lower()
+    wordDict = getWordData(word)
+    if wordDict is None:
+        return None
+    else:
+        genderCodes = ['masculine noun', 'feminine noun', 'masculine plural noun', 'feminine plural noun', 'masculine/feminine noun']
+        wordGenders = []
+
+        for code in wordDict[word]:
+            if code in genderCodes:
+                wordGenders.append(code)
+
+        if len(wordGenders) > 0:
+            return wordGenders[0]
+        else:
+            return None
+
+def canBeNoun(word):
+    word = word.lower()
+    if getGender(word) is not None:
+        return True
+    return False
+
+def isNoun(word):
+    word = word.lower()
+    if getAllGenders(word) is None:
+        return False
+    else:
+        return True
+
+def canBeVerb(word):
+    word = word.lower()
+    grammaticalCategories = getAllGrammaticalCategories(word)
+    if grammaticalCategories is None:
+        return False
+    else:
+        for category in grammaticalCategories:
+            if 'verb' in category:
+                return True
+        return False
+
+def isVerb(word):
+    word = word.lower()
+    if 'verb' in getGrammaticalCategory(word):
+        return True
+    return False
+
+def getAllGrammaticalCategories(word):
+    word = word.lower()
+    wordDict = getWordData(word)
+    if wordDict is None:
+        return None
+    else:
+        return wordDict[word]
+
+def getGrammaticalCategory(word):
+    word = word.lower()
+    wordDict = getWordData(word)
+    if wordDict is None:
+        return None
+    else:
+        return wordDict[word][0]
+
+# Function tests
+print(isVerb('Faire'))
