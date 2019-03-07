@@ -8,6 +8,9 @@ from bs4 import BeautifulSoup
 # Helper functions
 
 def getWordData(word):
+    if word == '':
+        return None
+    
     searchWord = word.lower()
     searchWordForURL = searchWord.replace(" ", "%20")
 
@@ -56,13 +59,16 @@ def getWordData(word):
             'interjinterjection' : 'interjection',
             'pron' : 'pronoun',
             'article' : 'article',
+            'adverbe' : 'adverb',
+            'prép' : 'preposition',
+            'conj' : 'conjunction',
         }
 
         for list in data:
             for text in list:
-                if text.split()[0] == searchWord:
+                if text.split()[0] == searchWord and len(text.split()) > 1:
                     textGrammarCode = text.split()[1]
-                    print(textGrammarCode)
+                    #print(textGrammarCode)
                     for code in grammarCodes:
                         if code in textGrammarCode and grammarCodes[code] not in wordDict[searchWord]:
                             wordDict.setdefault(searchWord, []).append(grammarCodes[code])
@@ -151,10 +157,16 @@ def getAllGrammaticalCategories(word):
 def getGrammaticalCategory(word):
     word = word.lower()
     wordDict = getWordData(word)
-    if wordDict is None:
+    if wordDict is None or len(wordDict[word]) <= 0:
         return None
     else:
         return wordDict[word][0]
 
-# Function tests
-print(isVerb('Faire'))
+""" 
+Function tests:
+
+testData = ['La', 'fréquentation', 'scolaire', 'ne', 'cesse', 'd’augmenter', 'mondialement', 'de', 'nos', 'jours', 'parallèlement', 'à', 'la', 'diminution', 'de', 'la', 'pauvreté', 'Alors', 'l’école', 'joue', 'un', 'rôle', 'croissant', 'dans', 'la', 'vie', 'et', 'donc', 'il', 'faut', 'l’analyser', 'Considérons', 'l’école', 'comme', 'système', '', 'une', 'composition', 'd’éléments', 'qui', 'fonctionnent', 'ensemble', 'afin', 'de', 'produire', 'dans', 'ce', 'cas', 'des', 'adultes', 'mûrs', 'et', 'instruits', 'Cette', 'dissertation', 'explorera', 'deux', 'tels', 'éléments', 'se', 'concentrant', 'sur', 'leurs', 'interactions', 'avec', 'les', 'inégalités', 'sociales', 'Tout', 'd’abord', 'nous', 'nous', 'intéressons', 'à', 'l’éducation', 'autour', 'de', 'laquelle', 'l’école', 'tourne', 'L’éducation', 'permet', 'à', 'l’étudiant', 'à', 'diriger', 'sa', 'vie', '—', 'elle', 'le', 'rend', 'capable', 'L’éducation', 'encourage', 'la', 'facilité', 'naturelle', 'qui', 'n’est', 'pas', 'forcément', 'déterminée', 'par', 'la', 'classe', 'sociale', 'Prenons', 'l’exemple', 'de', 'l’élève', 'venant', 'd’un', 'milieu', 'pauvre', 'qui', 'travaille', 'dur', 'tout', 'au', 'long', 'de', 'sa', 'scolarité', 'et', 'enfin', 'trouve', 'un', 'emploi', 'bien', 'payé', 'Cet', 'élève', 's’est', 'échappé', 'à', 'la', 'pauvreté', 'grâce', 'à', 'l’éducation', 'Ainsi', 'l’aspect', 'éducatif', 'de', 'l’école', 'sert', 'à', 'réduire', 'les', 'inégalités', 'sociales', 'Toutefois', 'l’école', 'ne', 'consiste', 'pas', 'que', 'de', 'l’éducation', 'L’école', 'assure', 'un', 'paysage', 'social', 'par', 'intermédiaire', 'duquel', 'des', 'liens', 'sociaux', 's’établissent', 'entre', 'les', 'élèves', 'Une', 'école', 'privée', 'ne', 'se', 'limite', 'qu’aux', 'familles', 'qui', 'ont', 'le', 'pouvoir', 'd’y', 'envoyer', 'leurs', 'enfants', 'Ces', 'enfants', 'ne', 'peuvent', 'faire', 'la', 'connaissance', 'que', 'd’eux', 'avec', 'qui', 'ils', 'étudient', 'à', 'l’école', 'En', 'fait', 'l’école', 'privée', 'crée', 'une', 'barrière', 'entre', 'ceux', 'qui', 'ont', 'le', 'pouvoir', 'financier', 'et', 'les', 'autres', 'Cette', 'barrière', 'sert', 'à', 'propager', 'les', 'inégalités', 'qui', 'existent', 'entre', 'les', 'riches', 'et', 'les', 'pauvres', 'parce', 'qu’elle', 'empêche', 'la', 'création', 'de', 'liens', 'entre', 'les', 'deux', 'Enfin', 'imaginons', 'le', 'système', 'éducatif', 'en', 'entier', 'Ce', 'système', 'tel', 'qu’il', 'est', 'expliqué', 'cidessus', 'n’est', 'pas', 'parfaite', 'Cela', 'veut', 'dire', 'qu’il', 'est', 'possible', 'de', 'dépasser', 'de', 'la', 'situation', 'actuelle', 'à', 'une', 'meilleure', 'En', 'conclusion', 'cette', 'dissertation', 'propose', 'la', 'démolition', 'de', 'la', 'barrière', 'sociale', 'qui', 'distingue', 'l’école', 'privée', 'de', 'l’école', 'publique', 'comme', 'moyen', 'd’atteindre', 'ce', 'dépassement']
+
+for word in testData:
+    print(word + " : " + str(getGrammaticalCategory(word)))
+"""
